@@ -16,6 +16,11 @@ void main() async {
 }
 ```
 
+## Acknowledgments
+
+This package is only possible thanks to the work of [documenting the Akai Fire's midi implementation done by Paul Curtis at Segger](https://blog.segger.com/decoding-the-akai-fire-part-1/).
+
+
 ## Features and bugs
 
 Please file feature requests and bugs at the [issue tracker][tracker].

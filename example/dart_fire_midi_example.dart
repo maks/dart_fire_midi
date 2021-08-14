@@ -11,4 +11,15 @@ void main() async {
   }
   final fire = FireDevice(midiDevices.first);
   print('fire device: $fire');
+  await fire.connectDevice();
+
+  fire.sendAllOff();
+  print('init: all off');
+
+  // typically ctrl-c in shell will generate a sigint
+  ProcessSignal.sigint.watch().listen((signal) {
+    print('sigint disconnecting');
+    fire.disconnectDevice();
+    exit(0);
+  });
 }
