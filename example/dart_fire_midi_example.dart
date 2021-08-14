@@ -16,6 +16,9 @@ void main() async {
   fire.sendAllOff();
   print('init: all off');
 
+  // uncomment to light up top left grid button blue
+  // fire.colorPad(0, 0, PadColor(0, 0, 127));
+
   // typically ctrl-c in shell will generate a sigint
   ProcessSignal.sigint.watch().listen((signal) {
     print('sigint disconnecting');
