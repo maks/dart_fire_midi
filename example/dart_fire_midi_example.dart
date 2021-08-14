@@ -19,6 +19,13 @@ void main() async {
   // uncomment to light up top left grid button blue
   // fire.colorPad(0, 0, PadColor(0, 0, 127));
 
+  // uncomment to show grid on top wuaarter of the oled screen
+  // final oled = List.filled(128 * 64, false);
+  // for (var i = 0; i < 128 * 8; i++) {
+  //   oled[i] = (i % 2) == 0;
+  // }
+  // fire.sendBitmap(oled);
+
   // typically ctrl-c in shell will generate a sigint
   ProcessSignal.sigint.watch().listen((signal) {
     print('sigint disconnecting');
