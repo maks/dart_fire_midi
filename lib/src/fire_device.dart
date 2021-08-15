@@ -3,6 +3,8 @@ import 'dart:typed_data';
 
 import 'package:midi/midi.dart';
 
+import 'input_events.dart';
+
 /// valid RGB values are 7it, ie. 0-127 ONLY
 class PadColor {
   final int r;
@@ -13,6 +15,7 @@ class PadColor {
 
   factory PadColor.off() => PadColor(0, 0, 0);
 }
+
 
 class FireDevice {
   static const _aBitMutate = [
@@ -32,30 +35,37 @@ class FireDevice {
 
   late StreamSubscription<MidiMessage> _midiSubscription;
 
+  final _inputStreamController = StreamController<FireInputEvent>();
+
+  Stream<FireInputEvent> get inputEvents => _inputStreamController.stream;
+
   FireDevice(this._device);
 
   Future<void> connectDevice() async {
     await _device.connect();
 
     _midiSubscription = _device.receivedMessages.listen((mesg) {
-      print('MIDI MESG: ${mesg.toDictionary}');
+      _inputStreamController.add(FireInputEvent.fromMidi(mesg.data));
     });
   }
 
+  // turn off all lights
   void sendAllOff() {
-    print('sending all OFF to:');
     _device.send(Uint8List.fromList([0xB0, 0x7F, 0]));
   }
 
+  // turn on all lights
   void sendAllOn() {
-    print('sending all ON to:');
     _device.send(Uint8List.fromList([0xB0, 0x7F, 1]));
   }
 
+  /// send monochrome bit map to the OLED display
+  /// MUST be 128 x 64 in length!!
   void sendBitmap(List<bool> bitmap) async {
     _sendSysexBitmap(bitmap);
   }
 
+  /// turn on and set the colour of a pad button
   void colorPad(int padRow, int padColumn, PadColor color) {
     final sysexHeader = Uint8List.fromList([
       0xF0, // System Exclusive

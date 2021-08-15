@@ -26,6 +26,10 @@ void main() async {
   // }
   // fire.sendBitmap(oled);
 
+  fire.inputEvents.listen((event) {
+    print('input event: $event');
+  });
+
   // typically ctrl-c in shell will generate a sigint
   ProcessSignal.sigint.watch().listen((signal) {
     print('sigint disconnecting');
