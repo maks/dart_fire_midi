@@ -1,4 +1,4 @@
-A library for communicating with a Akai Fire midi controller.
+A pure Dart library for communicating with a Akai Fire midi controller.
 
 ## Usage
 
@@ -16,6 +16,8 @@ void main() async {
 }
 ```
 
+see `example\dart_fire_midi_example.dart` for a more detailed example of how to use the package.
+
 ## Acknowledgments
 
 This package is only possible thanks to the work of [documenting the Akai Fire's midi implementation done by Paul Curtis at Segger](https://blog.segger.com/decoding-the-akai-fire-part-1/).
@@ -25,4 +27,4 @@ This package is only possible thanks to the work of [documenting the Akai Fire's
 
 Please file feature requests and bugs at the [issue tracker][tracker].
 
-[tracker]: http://github.com/maks/dart_fire_midi/issues/replaceme
+[tracker]: http://github.com/maks/dart_fire_midi/issues
