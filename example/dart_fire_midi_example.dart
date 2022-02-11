@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:dart_fire_midi/dart_fire_midi.dart';
+import 'package:dart_fire_midi/dart_fire_midi.dart' as fire;
 import 'package:midi/midi.dart';
 
 void main() async {
@@ -9,31 +9,39 @@ void main() async {
     print('missing akai fire controller');
     exit(1);
   }
-  final fire = FireDevice(midiDevices.first);
-  print('fire device: $fire');
-  await fire.connectDevice();
 
-  fire.sendAllOff();
+  final midiDev = midiDevices.firstWhere((dev) => dev.name.contains('FL STUDIO'));
+
+  if (midiDev == null) {
+    print('missing Akai Fire device');
+    return;
+  }
+  if (!(await midiDev.connect())) {
+    print('failed ot connect to Akai Fire device');
+    return;
+  }
+
+  midiDev.send(fire.allOffMessage);
   print('init: all off');
 
   // uncomment to light up top left grid button blue
-  // fire.colorPad(0, 0, PadColor(0, 0, 127));
+  midiDev.send(fire.colorPad(0, 0, fire.PadColor(10, 70, 50)));
 
-  // uncomment to show grid on top wuaarter of the oled screen
-  // final oled = List.filled(128 * 64, false);
-  // for (var i = 0; i < 128 * 8; i++) {
-  //   oled[i] = (i % 2) == 0;
-  // }
-  // fire.sendBitmap(oled);
+  // show grid on top quarter of the oled screen
+  final oled = List.filled(128 * 64, false);
+  for (var i = 0; i < 128 * 8; i++) {
+    oled[i] = (i % 2) == 0;
+  }
+  fire.sendBitmap(oled);
 
-  fire.inputEvents.listen((event) {
+  midiDev.receivedMessages.listen((event) {
     print('input event: $event');
   });
 
   // typically ctrl-c in shell will generate a sigint
   ProcessSignal.sigint.watch().listen((signal) {
     print('sigint disconnecting');
-    fire.disconnectDevice();
+    midiDev.disconnect();
     exit(0);
   });
 }
