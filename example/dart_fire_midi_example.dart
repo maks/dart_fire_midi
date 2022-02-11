@@ -2,8 +2,7 @@ import 'dart:io';
 
 import 'package:dart_fire_midi/dart_fire_midi.dart' as fire;
 import 'package:midi/midi.dart';
-
-import 'extensions.dart';
+import 'package:collection/collection.dart';
 
 void main() async {
   final midiDevices = AlsaMidiDevice.getDevices();
