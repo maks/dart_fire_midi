@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:dart_fire_midi/dart_fire_midi.dart' as fire;
 import 'package:midi/midi.dart';
 
+import 'extensions.dart';
+
 void main() async {
   final midiDevices = AlsaMidiDevice.getDevices();
   if (midiDevices.isEmpty) {
@@ -10,7 +12,7 @@ void main() async {
     exit(1);
   }
 
-  final midiDev = midiDevices.firstWhere((dev) => dev.name.contains('FL STUDIO'));
+  final midiDev = midiDevices.firstWhereOrNull((dev) => dev.name.contains('FL STUDIO'));
 
   if (midiDev == null) {
     print('missing Akai Fire device');
