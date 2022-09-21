@@ -18,11 +18,16 @@ enum ButtonCode {
   soloMute1(CC.muteButton1),
   soloMute2(CC.muteButton2),
   soloMute3(CC.muteButton3),
-  soloMute4(CC.muteButton4);
+  soloMute4(CC.muteButton4),
+  play(CC.play),
+  stop(CC.stop),
+  record(CC.record);
 
   const ButtonCode(this.code);
   final int code;
 }
+
+enum ButtonLedColor { off, color1, color2, color3, color4 }
 
 class ButtonControls {
   static Uint8List buttonOn(ButtonCode button, int ledColour) {
