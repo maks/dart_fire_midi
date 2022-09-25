@@ -33,4 +33,8 @@ class ButtonControls {
   static Uint8List buttonOn(ButtonCode button, int ledColour) {
     return CC.on(button.code, ledColour);
   }
+
+  static Uint8List buttonOff(ButtonCode button) {
+    return CC.on(button.code, 0);
+  }
 }

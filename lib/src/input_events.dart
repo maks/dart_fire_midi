@@ -2,15 +2,24 @@
 
 import 'dart:typed_data';
 
+import 'package:collection/collection.dart';
+
 import 'cc_inputs.dart';
 
 abstract class FireInputEvent {
   static FireInputEvent fromMidi(Uint8List data) {
-    if (data[0] == CC.dialRotate) {
-      return DialEvent(
-        data[2] == 127 ? DialDirection.Left : DialDirection.Right,
-        DialType.Select,
-      );
+    // print("EVENT:$data");
+    final DialType? maybeDialType = DialType.values.firstWhereOrNull((dt) => dt.id == data[1]);
+    if (maybeDialType != null) {
+      final dialMotionValue = data[2];
+      final dialVelocity = (dialMotionValue > 64) ? 128 - dialMotionValue : dialMotionValue;
+      late final DialDirection dir;
+      if (data[0] == 176) {
+        dir = (dialMotionValue > 64) ? DialDirection.Left : DialDirection.Right;
+      } else {
+        dir = (data[0] == CC.buttonDown) ? DialDirection.TouchOn : DialDirection.TouchOff;
+      }
+      return DialEvent(maybeDialType, dir, dialVelocity);
     } else if (data[0] == CC.buttonDown) {
       return _getButton(data[1], true);
     } else if (data[0] == CC.buttonUp) {
@@ -86,7 +95,16 @@ abstract class FireInputEvent {
   }
 }
 
-enum DialType { Select, Volume, Pan, Filter, Resonance }
+enum DialType {
+  Select(25),
+  Volume(16),
+  Pan(17),
+  Filter(18),
+  Resonance(19);
+
+  final int id;
+  const DialType(this.id);
+}
 
 enum ButtonType {
   PatternUp,
@@ -117,14 +135,24 @@ enum ButtonType {
   Pad
 }
 
-enum DialDirection { Left, Right }
+enum DialDirection {
+  Left(127),
+  Right(1),
+  TouchOn(144),
+  TouchOff(128);
+
+  final int id;
+  const DialDirection(this.id);
+}
+
 enum ButtonDirection { Up, Down }
 
 class DialEvent extends FireInputEvent {
   final DialDirection dir;
   final DialType type;
+  final int velocity;
 
-  DialEvent(this.dir, this.type);
+  DialEvent(this.type, this.dir, this.velocity);
 
   @override
   String toString() {
@@ -158,8 +186,7 @@ class PadEvent extends ButtonEvent {
 
   static bool isValidPadId(int id) => (id >= _baseId) && (id <= _endId);
 
-  PadEvent(this.row, this.column, this.direction)
-      : super(ButtonType.Pad, direction);
+  PadEvent(this.row, this.column, this.direction) : super(ButtonType.Pad, direction);
 
   factory PadEvent.fromMidi(int id, ButtonDirection direction) {
     final offset = id - _baseId;
