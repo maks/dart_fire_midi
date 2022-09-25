@@ -30,6 +30,9 @@ Uint8List get allOffMessage => Uint8List.fromList([0xB0, 0x7F, 0]);
 // turn on all lights
 Uint8List get allOnMessage => Uint8List.fromList([0xB0, 0x7F, 1]);
 
+// turn on all lights
+Uint8List get allPadOff => colorPadsList(0, 0, [for (var i = 0; i < 64; i++) PadColor.off()]);
+
 /// send monochrome bit map to the OLED display
 /// MUST be 128 x 64 in length!!
 Uint8List sendBitmap(List<bool> bitmap) => _sendSysexBitmap(bitmap);
@@ -55,6 +58,45 @@ Uint8List colorPad(int padRow, int padColumn, PadColor color) {
     color.g,
     color.b,
   ]);
+
+  final b = BytesBuilder();
+  b.add(sysexHeader);
+  b.add(ledData);
+  b.add(sysexFooter);
+
+  final midiData = b.toBytes();
+  return Uint8List.fromList(midiData);
+}
+
+/// turn on and set pads with the colours in the list, starting at padRow, padColumn
+Uint8List colorPadsList(int padRow, int padColumn, List<PadColor> colors) {
+  final colorsBytesLength = colors.length * 4;
+  final lengthHighByte = colorsBytesLength >> 7;
+  final lengthLowByte = colorsBytesLength & 0x7F;
+  final sysexHeader = Uint8List.fromList([
+    0xF0, // System Exclusive
+    0x47, // Akai Manufacturer ID
+    0x7F, // The All-Call address
+    0x43, // “Fire” product
+    0x65, // Write LED cmd
+    lengthHighByte, // mesg length - high byte
+    lengthLowByte, // mesg length - low byte
+  ]);
+  final sysexFooter = Uint8List.fromList([
+    0xF7, // End of Exclusive
+  ]);
+
+  final startPadIndex = (padRow * 16 + padColumn);
+
+  int i = startPadIndex;
+  final dataList = colors.map((color) => Uint8List.fromList([
+        i++,
+        color.r,
+        color.g,
+        color.b,
+      ]));
+
+  final ledData = Uint8List.fromList(dataList.expand((x) => x).toList());
 
   final b = BytesBuilder();
   b.add(sysexHeader);
