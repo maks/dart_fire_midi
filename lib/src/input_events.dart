@@ -9,7 +9,10 @@ import 'cc_inputs.dart';
 abstract class FireInputEvent {
   static FireInputEvent fromMidi(Uint8List data) {
     // print("EVENT:$data");
-    final DialType? maybeDialType = DialType.values.firstWhereOrNull((dt) => dt.id == data[1]);
+    DialType? maybeDialType = DialType.values.firstWhereOrNull((dt) => dt.id == data[1]);
+    if (data[2] == CC.selectDown) {
+      maybeDialType = DialType.Select;
+    }
     if (maybeDialType != null) {
       final dialMotionValue = data[2];
       final dialVelocity = (dialMotionValue > 64) ? 128 - dialMotionValue : dialMotionValue;
@@ -96,11 +99,11 @@ abstract class FireInputEvent {
 }
 
 enum DialType {
-  Select(25),
-  Volume(16),
-  Pan(17),
-  Filter(18),
-  Resonance(19);
+  Select(CC.select),
+  Volume(CC.volume),
+  Pan(CC.pan),
+  Filter(CC.filter),
+  Resonance(CC.resonance);
 
   final int id;
   const DialType(this.id);
@@ -136,39 +139,33 @@ enum ButtonType {
 }
 
 enum DialDirection {
-  Left(127),
-  Right(1),
-  TouchOn(144),
-  TouchOff(128);
-
-  final int id;
-  const DialDirection(this.id);
+  Left, Right, TouchOn, TouchOff
 }
 
 enum ButtonDirection { Up, Down }
 
 class DialEvent extends FireInputEvent {
-  final DialDirection dir;
+  final DialDirection direction;
   final DialType type;
   final int velocity;
 
-  DialEvent(this.type, this.dir, this.velocity);
+  DialEvent(this.type, this.direction, this.velocity);
 
   @override
   String toString() {
-    return 'Dial: $type dir: $dir';
+    return 'Dial: $type dir: $direction vel:$velocity';
   }
 }
 
 class ButtonEvent extends FireInputEvent {
   final ButtonType type;
-  final ButtonDirection dir;
+  final ButtonDirection direction;
 
-  ButtonEvent(this.type, this.dir);
+  ButtonEvent(this.type, this.direction);
 
   @override
   String toString() {
-    return 'Button: $type dir: $dir';
+    return 'Button: $type dir: $direction';
   }
 }
 
@@ -182,11 +179,10 @@ class PadEvent extends ButtonEvent {
 
   final int row;
   final int column;
-  final ButtonDirection direction;
 
   static bool isValidPadId(int id) => (id >= _baseId) && (id <= _endId);
 
-  PadEvent(this.row, this.column, this.direction) : super(ButtonType.Pad, direction);
+  PadEvent(this.row, this.column, ButtonDirection direction) : super(ButtonType.Pad, direction);
 
   factory PadEvent.fromMidi(int id, ButtonDirection direction) {
     final offset = id - _baseId;
@@ -202,5 +198,5 @@ class PadEvent extends ButtonEvent {
   }
 
   @override
-  String toString() => 'PadInput $row:$column dir: $dir';
+  String toString() => 'PadInput $row:$column dir: $direction';
 }
