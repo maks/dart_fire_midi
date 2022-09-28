@@ -6,7 +6,7 @@ class PadColor {
   final int g;
   final int b;
 
-  PadColor(this.r, this.g, this.b);
+  const PadColor(this.r, this.g, this.b);
 
   factory PadColor.off() => PadColor(0, 0, 0);
 }
