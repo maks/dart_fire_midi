@@ -24,73 +24,74 @@ abstract class FireInputEvent {
       }
       return DialEvent(maybeDialType, dir, dialVelocity);
     } else if (data[0] == CC.buttonDown) {
-      return _getButton(data[1], true);
+      final int buttonVelocity = data[2];
+      return _getButton(data[1], true, buttonVelocity);
     } else if (data[0] == CC.buttonUp) {
-      return _getButton(data[1], false);
+      return _getButton(data[1], false, 0);
     }
     return UnknownEvent();
   }
 
-  static ButtonEvent _getButton(int code, bool down) {
+  static ButtonEvent _getButton(int code, bool down, int velocity) {
     final dir = down ? ButtonDirection.Down : ButtonDirection.Up;
 
     if (PadEvent.isValidPadId(code)) {
-      return PadEvent.fromMidi(code, dir);
+      return PadEvent.fromMidi(code, dir, velocity);
     }
 
     switch (code) {
       case CC.bankSelect:
-        return ButtonEvent(ButtonType.BankSelect, dir);
+        return ButtonEvent(ButtonType.BankSelect, dir, velocity);
       case CC.volume:
-        return ButtonEvent(ButtonType.Volume, dir);
+        return ButtonEvent(ButtonType.Volume, dir, velocity);
       case CC.pan:
-        return ButtonEvent(ButtonType.Pan, dir);
+        return ButtonEvent(ButtonType.Pan, dir, velocity);
       case CC.filter:
-        return ButtonEvent(ButtonType.Filter, dir);
+        return ButtonEvent(ButtonType.Filter, dir, velocity);
       case CC.resonance:
-        return ButtonEvent(ButtonType.Resonance, dir);
+        return ButtonEvent(ButtonType.Resonance, dir, velocity);
       case CC.patternUp:
-        return ButtonEvent(ButtonType.PatternUp, dir);
+        return ButtonEvent(ButtonType.PatternUp, dir, velocity);
       case CC.patternDown:
-        return ButtonEvent(ButtonType.PatterDown, dir);
+        return ButtonEvent(ButtonType.PatterDown, dir, velocity);
       case CC.browser:
-        return ButtonEvent(ButtonType.Browser, dir);
+        return ButtonEvent(ButtonType.Browser, dir, velocity);
       case CC.selectDown:
-        return ButtonEvent(ButtonType.Select, dir);
+        return ButtonEvent(ButtonType.Select, dir, velocity);
       case CC.gridLeft:
-        return ButtonEvent(ButtonType.GridLeft, dir);
+        return ButtonEvent(ButtonType.GridLeft, dir, velocity);
       case CC.gridRight:
-        return ButtonEvent(ButtonType.GridRight, dir);
+        return ButtonEvent(ButtonType.GridRight, dir, velocity);
 
       case CC.muteButton1:
-        return ButtonEvent(ButtonType.MuteButton1, dir);
+        return ButtonEvent(ButtonType.MuteButton1, dir, velocity);
       case CC.muteButton2:
-        return ButtonEvent(ButtonType.MuteButton2, dir);
+        return ButtonEvent(ButtonType.MuteButton2, dir, velocity);
       case CC.muteButton3:
-        return ButtonEvent(ButtonType.MuteButton3, dir);
+        return ButtonEvent(ButtonType.MuteButton3, dir, velocity);
       case CC.muteButton4:
-        return ButtonEvent(ButtonType.MuteButton4, dir);
+        return ButtonEvent(ButtonType.MuteButton4, dir, velocity);
 
       case CC.step:
-        return ButtonEvent(ButtonType.Step, dir);
+        return ButtonEvent(ButtonType.Step, dir, velocity);
       case CC.note:
-        return ButtonEvent(ButtonType.Note, dir);
+        return ButtonEvent(ButtonType.Note, dir, velocity);
       case CC.drum:
-        return ButtonEvent(ButtonType.Drum, dir);
+        return ButtonEvent(ButtonType.Drum, dir, velocity);
       case CC.perform:
-        return ButtonEvent(ButtonType.Perform, dir);
+        return ButtonEvent(ButtonType.Perform, dir, velocity);
       case CC.shift:
-        return ButtonEvent(ButtonType.Shift, dir);
+        return ButtonEvent(ButtonType.Shift, dir, velocity);
       case CC.alt:
-        return ButtonEvent(ButtonType.Alt, dir);
+        return ButtonEvent(ButtonType.Alt, dir, velocity);
       case CC.pattern:
-        return ButtonEvent(ButtonType.Pattern, dir);
+        return ButtonEvent(ButtonType.Pattern, dir, velocity);
       case CC.play:
-        return ButtonEvent(ButtonType.Play, dir);
+        return ButtonEvent(ButtonType.Play, dir, velocity);
       case CC.stop:
-        return ButtonEvent(ButtonType.Stop, dir);
+        return ButtonEvent(ButtonType.Stop, dir, velocity);
       case CC.record:
-        return ButtonEvent(ButtonType.Record, dir);
+        return ButtonEvent(ButtonType.Record, dir, velocity);
 
       default:
         throw UnimplementedError();
@@ -160,12 +161,13 @@ class DialEvent extends FireInputEvent {
 class ButtonEvent extends FireInputEvent {
   final ButtonType type;
   final ButtonDirection direction;
+  final int velocity;
 
-  ButtonEvent(this.type, this.direction);
+  ButtonEvent(this.type, this.direction, this.velocity);
 
   @override
   String toString() {
-    return 'Button: $type dir: $direction';
+    return 'Button: $type dir: $direction vel:$velocity';
   }
 }
 
@@ -182,9 +184,9 @@ class PadEvent extends ButtonEvent {
 
   static bool isValidPadId(int id) => (id >= _baseId) && (id <= _endId);
 
-  PadEvent(this.row, this.column, ButtonDirection direction) : super(ButtonType.Pad, direction);
+  PadEvent(this.row, this.column, ButtonDirection direction, int velocity) : super(ButtonType.Pad, direction, velocity);
 
-  factory PadEvent.fromMidi(int id, ButtonDirection direction) {
+  factory PadEvent.fromMidi(int id, ButtonDirection direction, int velocity) {
     final offset = id - _baseId;
 
     if (offset > 63) {
@@ -194,6 +196,7 @@ class PadEvent extends ButtonEvent {
       offset ~/ padsPerRow,
       offset % padsPerRow,
       direction,
+      velocity,
     );
   }
 
