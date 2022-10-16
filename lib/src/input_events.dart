@@ -53,7 +53,7 @@ abstract class FireInputEvent {
       case CC.patternUp:
         return ButtonEvent(ButtonType.PatternUp, dir, velocity);
       case CC.patternDown:
-        return ButtonEvent(ButtonType.PatterDown, dir, velocity);
+        return ButtonEvent(ButtonType.PatternDown, dir, velocity);
       case CC.browser:
         return ButtonEvent(ButtonType.Browser, dir, velocity);
       case CC.selectDown:
@@ -112,7 +112,7 @@ enum DialType {
 
 enum ButtonType {
   PatternUp,
-  PatterDown,
+  PatternDown,
   Browser,
   GridLeft,
   GridRight,
