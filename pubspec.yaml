@@ -1,6 +1,6 @@
 name: dart_fire_midi
 description: A library for communicating with a Akai Fire midi controller.
-version: 0.2.0
+version: 0.3.0
 homepage: http://github.com/maks/dart_fire_midi
 
 environment:

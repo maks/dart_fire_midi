@@ -1,3 +1,7 @@
+## 0.3.0
+ * add support for pad velocity
+ * fix typo in PatternDown name 
+
 ## 0.2.0
  * allow setting consecutive groups of pads
  * fix handling Select dial push button
